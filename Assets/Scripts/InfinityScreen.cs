@@ -1,42 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
+[RequireComponent(typeof(SpriteRenderer))]
 public class InfinityScreen : MonoBehaviour
 {
 
-    [SerializeField] private Renderer rend;
-    [SerializeField] private Texture2D texture;
-    [SerializeField] private int mipCount;
+    [SerializeField] private SpriteRenderer _renderer;
+    [SerializeField] private Texture2D _texture;
+    [SerializeField] private Sprite _sprite;
+    [SerializeField] private int width;
+    [SerializeField] private int height;
 
     void Start()
     {
-        rend = GetComponent<SpriteRenderer>();
+        _renderer = GetComponent<SpriteRenderer>();
+        _texture = new Texture2D(width, width);
+        _sprite = Sprite.Create(_texture, new Rect(0, 0, width, height), Vector2.one * 0.5f);
 
-        // duplicate the original texture and assign to the material
-        //texture = Instantiate(rend.) as Texture2D;
-        //rend.material.mainTexture = texture;
-        texture = rend.material.mainTexture as Texture2D;
-
-        // colors used to tint the first 3 mip levels
-        Color[] colors = new Color[3];
-        colors[0] = Color.red;
-        colors[1] = Color.green;
-        colors[2] = Color.blue;
-        mipCount = Mathf.Min(3, texture.mipmapCount);
-
-        // tint each mip level
-        for (int mip = 0; mip < mipCount; ++mip)
+        foreach (int x in Enumerable.Range(0, width))
         {
-            Color[] cols = texture.GetPixels(mip);
-            for (int i = 0; i < cols.Length; ++i)
+            foreach (int y in Enumerable.Range(0, height))
             {
-                cols[i] = Color.Lerp(cols[i], colors[mip], 0.33f);
+                _texture.SetPixel(x, y, Color.green);
             }
-            texture.SetPixels(cols, mip);
         }
-        // actually apply all SetPixels, don't recalculate mip levels
-        texture.Apply(false);
+        _texture.Apply();
+        _renderer.sprite = _sprite;
     }
 
     // Update is called once per frame
