@@ -12,13 +12,16 @@ public class InfinityScreen : MonoBehaviour
     [SerializeField] private Sprite _sprite;
     [SerializeField] private int width;
     [SerializeField] private int height;
+    [SerializeField][Range(0,1)] private float _bias;
     [SerializeField] private Color _newColor;
+    private Color[] _newColors;
 
     void Start()
     {
         _renderer = GetComponent<SpriteRenderer>();
         _texture = new Texture2D(width, width);
         _sprite = Sprite.Create(_texture, new Rect(0, 0, width, height), Vector2.one * 0.5f);
+        _newColors = new Color[width * height];
 
         foreach (int x in Enumerable.Range(0, width))
         {
@@ -34,8 +37,23 @@ public class InfinityScreen : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        _newColor = new Color(Random.value, Random.value, Random.value);
-        _texture.SetPixel((int)(Random.value * width), (int)(Random.value * height), _newColor);
+
+        foreach (int x in Enumerable.Range(0, width))
+        {
+            foreach (int y in Enumerable.Range(0, height))
+            {
+                if (Random.value > _bias)
+                {
+                    _newColors[x + y * width] = Color.black;
+                }
+                else
+                {
+                    _newColors[x + y * width] = Color.white;
+                }
+            }
+        }
+
+        _texture.SetPixels(_newColors);
         //_sprite.
         _texture.Apply();
     }
