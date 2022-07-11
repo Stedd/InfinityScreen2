@@ -210,7 +210,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 0.1
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -385,8 +385,8 @@ MonoBehaviour:
   _renderer: {fileID: 0}
   _texture: {fileID: 0}
   _sprite: {fileID: 0}
-  width: 250
-  height: 250
+  width: 20
+  height: 20
   _bias: 0.318
   _newColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!212 &1574532377
