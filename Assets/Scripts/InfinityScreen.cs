@@ -12,6 +12,7 @@ public class InfinityScreen : MonoBehaviour
     [SerializeField] private Sprite _sprite;
     [SerializeField] private int width;
     [SerializeField] private int height;
+    [SerializeField] private Color _newColor;
 
     void Start()
     {
@@ -33,6 +34,9 @@ public class InfinityScreen : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        _newColor = new Color(Random.value, Random.value, Random.value);
+        _texture.SetPixel((int)(Random.value * width), (int)(Random.value * height), _newColor);
+        //_sprite.
+        _texture.Apply();
     }
 }
