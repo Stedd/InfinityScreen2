@@ -31,6 +31,9 @@ public class InfinityScreen : MonoBehaviour
             }
         }
         _texture.Apply();
+        _texture.wrapMode = TextureWrapMode.Clamp;
+        _texture.filterMode = FilterMode.Point;
+
         _renderer.sprite = _sprite;
     }
 
