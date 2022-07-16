@@ -15,14 +15,11 @@ public class InfinityScreen : MonoBehaviour
     [SerializeField] [Range(0, 1)] private float _bias;
     private Color32[] _colorData;
 
-    delegate Color32 ColorPickerDelegate(Color32 color);
-    private ColorPickerDelegate _colorPicker;
-
+    //delegate Color32 SetPixelColorDelegate(int x, int y, Color[] color);
+    delegate Color32 SetPixelColorDelegate(Color[] color);
 
     void Start()
     {
-        _colorPicker = ColorPicker;
-
         InitRenderer();
 
         InitTexture();
@@ -34,27 +31,25 @@ public class InfinityScreen : MonoBehaviour
         UpdateTexture();
     }
 
-    private Color32 ColorPicker(Color32 color)
-    {
-        return color;
-    }
-
     private void InitColorData()
     {
         _colorData = new Color32[width * height];
-        UpdateColorData();
+                Color[] colorArray = new Color[1];
+                colorArray[0] = Color.white;
+        UpdateColorData(SetPixelColor(colorArray));
     }
 
-    private void UpdateColorData()
+    private void UpdateColorData(SetPixelColorDelegate _colorPicker)
     {
         foreach (int x in Enumerable.Range(0, width))
         {
             foreach (int y in Enumerable.Range(0, height))
             {
-                _colorData[x + y * width] = _colorPicker(Color.white);
+                _colorPicker(x, y, colorArray);
             }
         }
     }
+
 
     private void InitSprite()
     {
@@ -90,17 +85,30 @@ public class InfinityScreen : MonoBehaviour
         {
             foreach (int y in Enumerable.Range(0, height))
             {
-                if (Random.value > _bias)
-                {
-                    _colorData[x + y * width] = _colorPicker(Color.black);
-                }
-                else
-                {
-                    _colorData[x + y * width] = _colorPicker(Color.white);
-                }
+                Color[] colorArray = new Color[1];
+                colorArray[0] = Color.white;
+                colorArray[1] = Color.black;
+                SetBiasedPixelColor(x, y, colorArray);
             }
         }
 
         UpdateTexture();
+    }
+
+    private void SetBiasedPixelColor(Color[] _color)
+    {
+        if (Random.value > _bias)
+        {
+            _colorData[x + y * width] = _color[0];
+        }
+        else
+        {
+            _colorData[x + y * width] = _color[1];
+        }
+    }
+
+    private void SetPixelColor(Color[] _color)
+    {
+        _colorData[x + y * width] = _color[0];
     }
 }
