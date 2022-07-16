@@ -15,8 +15,14 @@ public class InfinityScreen : MonoBehaviour
     [SerializeField] [Range(0, 1)] private float _bias;
     private Color32[] _colorData;
 
+    delegate Color32 ColorPickerDelegate(Color32 color);
+    private ColorPickerDelegate _colorPicker;
+
+
     void Start()
     {
+        _colorPicker = ColorPicker;
+
         InitRenderer();
 
         InitTexture();
@@ -27,6 +33,12 @@ public class InfinityScreen : MonoBehaviour
 
         UpdateTexture();
     }
+
+    private Color32 ColorPicker(Color32 color)
+    {
+        return color;
+    }
+
     private void InitColorData()
     {
         _colorData = new Color32[width * height];
@@ -39,7 +51,7 @@ public class InfinityScreen : MonoBehaviour
         {
             foreach (int y in Enumerable.Range(0, height))
             {
-                _colorData[x + y * width] = Color.white;
+                _colorData[x + y * width] = _colorPicker(Color.white);
             }
         }
     }
@@ -80,11 +92,11 @@ public class InfinityScreen : MonoBehaviour
             {
                 if (Random.value > _bias)
                 {
-                    _colorData[x + y * width] = Color.black;
+                    _colorData[x + y * width] = _colorPicker(Color.black);
                 }
                 else
                 {
-                    _colorData[x + y * width] = Color.white;
+                    _colorData[x + y * width] = _colorPicker(Color.white);
                 }
             }
         }
