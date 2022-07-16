@@ -12,29 +12,62 @@ public class InfinityScreen : MonoBehaviour
     [SerializeField] private Sprite _sprite;
     [SerializeField] private int width;
     [SerializeField] private int height;
-    [SerializeField][Range(0,1)] private float _bias;
-    [SerializeField] private Color _newColor;
-    private Color[] _newColors;
+    [SerializeField] [Range(0, 1)] private float _bias;
+    private Color32[] _colorData;
 
     void Start()
     {
-        _renderer = GetComponent<SpriteRenderer>();
-        _texture = new Texture2D(width, width);
-        _sprite = Sprite.Create(_texture, new Rect(0, 0, width, height), Vector2.one * 0.5f);
-        _newColors = new Color[width * height];
+        InitRenderer();
 
+        InitTexture();
+
+        InitSprite();
+
+        InitColorData();
+
+        UpdateTexture();
+    }
+    private void InitColorData()
+    {
+        _colorData = new Color32[width * height];
+        UpdateColorData();
+    }
+
+    private void UpdateColorData()
+    {
         foreach (int x in Enumerable.Range(0, width))
         {
             foreach (int y in Enumerable.Range(0, height))
             {
-                _texture.SetPixel(x, y, Color.green);
+                _colorData[x + y * width] = Color.white;
             }
         }
-        _texture.Apply();
-        _texture.wrapMode = TextureWrapMode.Clamp;
-        _texture.filterMode = FilterMode.Point;
+    }
 
+    private void InitSprite()
+    {
+        _sprite = Sprite.Create(_texture, new Rect(0, 0, width, height), Vector2.one * 0.5f);
         _renderer.sprite = _sprite;
+    }
+
+    private void InitRenderer()
+    {
+        _renderer = GetComponent<SpriteRenderer>();
+    }
+
+    private void InitTexture()
+    {
+        _texture = new Texture2D(width, width)
+        {
+            wrapMode = TextureWrapMode.Clamp,
+            filterMode = FilterMode.Point
+        };
+    }
+
+    private void UpdateTexture()
+    {
+        _texture.SetPixels32(_colorData);
+        _texture.Apply();
     }
 
     // Update is called once per frame
@@ -47,17 +80,15 @@ public class InfinityScreen : MonoBehaviour
             {
                 if (Random.value > _bias)
                 {
-                    _newColors[x + y * width] = Color.black;
+                    _colorData[x + y * width] = Color.black;
                 }
                 else
                 {
-                    _newColors[x + y * width] = Color.white;
+                    _colorData[x + y * width] = Color.white;
                 }
             }
         }
 
-        _texture.SetPixels(_newColors);
-        //_sprite.
-        _texture.Apply();
+        UpdateTexture();
     }
 }
