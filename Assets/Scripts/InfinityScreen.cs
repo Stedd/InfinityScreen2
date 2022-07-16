@@ -15,6 +15,8 @@ public class InfinityScreen : MonoBehaviour
     [SerializeField] [Range(0, 1)] private float _bias;
     private Color32[] _colorData;
 
+    delegate Color32 ColorPickerDelegate(Color32[] color);
+
     void Start()
     {
         InitRenderer();
@@ -27,19 +29,22 @@ public class InfinityScreen : MonoBehaviour
 
         UpdateTexture();
     }
+
     private void InitColorData()
     {
         _colorData = new Color32[width * height];
-        UpdateColorData();
+        Color32[] colorArray = new Color32[1];
+        colorArray[0] = Color.white;
+        UpdateColorData(colorArray, SetPixelColor);
     }
 
-    private void UpdateColorData()
+    private void UpdateColorData(Color32[] color, ColorPickerDelegate colorPicker)
     {
         foreach (int x in Enumerable.Range(0, width))
         {
             foreach (int y in Enumerable.Range(0, height))
             {
-                _colorData[x + y * width] = Color.white;
+                _colorData[x + y * width] = colorPicker(color);
             }
         }
     }
@@ -74,21 +79,57 @@ public class InfinityScreen : MonoBehaviour
     void Update()
     {
 
-        foreach (int x in Enumerable.Range(0, width))
+        Color32[] colorArray = new Color32[2];
+        colorArray[0] = Color.white;
+        colorArray[1] = Color.black;
+
+        UpdateColorData(colorArray, SetBiasedPixelColor);
+
+        //Color32[] colorArray = new Color32[9];
+        //colorArray[0] = Color.white;
+        //colorArray[1] = Color.red;
+        //colorArray[2] = Color.green;
+        //colorArray[3] = Color.blue;
+        //colorArray[4] = Color.cyan;
+        //colorArray[5] = Color.magenta;
+        //colorArray[6] = Color.yellow;
+        //colorArray[7] = Color.black;
+        //colorArray[8] = Color.grey;
+        //UpdateColorData(colorArray, SetDistributedPixelColor);
+
+        UpdateTexture();
+    }
+
+    private Color32 SetDistributedPixelColor(Color32[] colors)
+    {
+        Color returnColor = colors[0];
+        float propabilityLimit = 1f / colors.Length;
+        foreach (Color color in colors)
         {
-            foreach (int y in Enumerable.Range(0, height))
+            if (Random.value < propabilityLimit)
             {
-                if (Random.value > _bias)
-                {
-                    _colorData[x + y * width] = Color.black;
-                }
-                else
-                {
-                    _colorData[x + y * width] = Color.white;
-                }
+                returnColor = color;
+                break;
             }
         }
 
-        UpdateTexture();
+        return returnColor;
+    }
+
+    private Color32 SetBiasedPixelColor(Color32[] _color)
+    {
+        if (Random.value > _bias)
+        {
+            return _color[0];
+        }
+        else
+        {
+            return _color[1];
+        }
+    }
+
+    private Color32 SetPixelColor(Color32[] _color)
+    {
+        return _color[0];
     }
 }
