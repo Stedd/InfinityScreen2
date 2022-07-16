@@ -15,8 +15,7 @@ public class InfinityScreen : MonoBehaviour
     [SerializeField] [Range(0, 1)] private float _bias;
     private Color32[] _colorData;
 
-    //delegate Color32 SetPixelColorDelegate(int x, int y, Color[] color);
-    delegate Color32 SetPixelColorDelegate(Color[] color);
+    delegate Color32 ColorPickerDelegate(Color32[] color);
 
     void Start()
     {
@@ -34,22 +33,21 @@ public class InfinityScreen : MonoBehaviour
     private void InitColorData()
     {
         _colorData = new Color32[width * height];
-                Color[] colorArray = new Color[1];
-                colorArray[0] = Color.white;
-        UpdateColorData(SetPixelColor(colorArray));
+        Color32[] colorArray = new Color32[1];
+        colorArray[0] = Color.white;
+        UpdateColorData(colorArray, SetPixelColor);
     }
 
-    private void UpdateColorData(SetPixelColorDelegate _colorPicker)
+    private void UpdateColorData(Color32[] color, ColorPickerDelegate colorPicker)
     {
         foreach (int x in Enumerable.Range(0, width))
         {
             foreach (int y in Enumerable.Range(0, height))
             {
-                _colorPicker(x, y, colorArray);
+                _colorData[x + y * width] = colorPicker(color);
             }
         }
     }
-
 
     private void InitSprite()
     {
@@ -81,34 +79,57 @@ public class InfinityScreen : MonoBehaviour
     void Update()
     {
 
-        foreach (int x in Enumerable.Range(0, width))
-        {
-            foreach (int y in Enumerable.Range(0, height))
-            {
-                Color[] colorArray = new Color[1];
-                colorArray[0] = Color.white;
-                colorArray[1] = Color.black;
-                SetBiasedPixelColor(x, y, colorArray);
-            }
-        }
+        Color32[] colorArray = new Color32[2];
+        colorArray[0] = Color.white;
+        colorArray[1] = Color.black;
+
+        UpdateColorData(colorArray, SetBiasedPixelColor);
+
+        //Color32[] colorArray = new Color32[9];
+        //colorArray[0] = Color.white;
+        //colorArray[1] = Color.red;
+        //colorArray[2] = Color.green;
+        //colorArray[3] = Color.blue;
+        //colorArray[4] = Color.cyan;
+        //colorArray[5] = Color.magenta;
+        //colorArray[6] = Color.yellow;
+        //colorArray[7] = Color.black;
+        //colorArray[8] = Color.grey;
+        //UpdateColorData(colorArray, SetDistributedPixelColor);
 
         UpdateTexture();
     }
 
-    private void SetBiasedPixelColor(Color[] _color)
+    private Color32 SetDistributedPixelColor(Color32[] colors)
+    {
+        Color returnColor = colors[0];
+        float propabilityLimit = 1f / colors.Length;
+        foreach (Color color in colors)
+        {
+            if (Random.value < propabilityLimit)
+            {
+                returnColor = color;
+                break;
+            }
+        }
+
+        return returnColor;
+    }
+
+    private Color32 SetBiasedPixelColor(Color32[] _color)
     {
         if (Random.value > _bias)
         {
-            _colorData[x + y * width] = _color[0];
+            return _color[0];
         }
         else
         {
-            _colorData[x + y * width] = _color[1];
+            return _color[1];
         }
     }
 
-    private void SetPixelColor(Color[] _color)
+    private Color32 SetPixelColor(Color32[] _color)
     {
-        _colorData[x + y * width] = _color[0];
+        return _color[0];
     }
 }
